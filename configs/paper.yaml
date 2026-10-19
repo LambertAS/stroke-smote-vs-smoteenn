@@ -1,0 +1,46 @@
+# Paper profile: replicates archive/original_colab_notebook.ipynb exactly, quirks included.
+name: paper
+seed: 42
+output_dir: results/paper
+
+data:
+  path: data/raw/healthcare-dataset-stroke-data.csv
+
+preprocessing:
+  # "full_data_mean": BMI mean of all 5,110 rows, before the split (the original's small leak).
+  # "train_mean": mean of the training rows only (corrected profile).
+  bmi_imputation: full_data_mean
+
+split:
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+
+regimes: [none, smote, smoteenn]
+
+models:
+  lr:
+    params:
+      max_iter: 1000
+      random_state: 42
+    # Quirk of the original: only the SMOTE variant set class_weight="balanced".
+    # On a perfectly balanced training set this has no effect.
+    overrides:
+      smote:
+        class_weight: balanced
+  svm:
+    params:
+      kernel: rbf
+      probability: true
+      random_state: 42
+  xgb:
+    params:
+      n_estimators: 200
+      learning_rate: 0.05
+      max_depth: 4
+      subsample: 0.8
+      colsample_bytree: 0.8
+      objective: "binary:logistic"
+      eval_metric: logloss
+      n_jobs: -1
+      random_state: 42
