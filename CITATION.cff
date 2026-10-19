@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below and, if relevant, this repository."
+title: "stroke-smote-vs-smoteenn: reproduction code for a comparative study of SMOTE and SMOTE-ENN on stroke data"
+type: software
+license: MIT
+repository-code: "https://github.com/LambertAS/stroke-smote-vs-smoteenn"
+version: 0.1.0
+date-released: 2026-10-19
+authors:
+  - family-names: Soehardjianto
+    given-names: Lambert Aditama
+    affiliation: BINUS University
+  - family-names: Soetresno
+    given-names: Wilsen
+    affiliation: BINUS University
+  - family-names: Sihotang
+    given-names: Erna Fransisca Angela
+    affiliation: BINUS University
+  - family-names: Ohyver
+    given-names: Margaretha
+    affiliation: BINUS University
+keywords:
+  - imbalanced learning
+  - SMOTE
+  - SMOTE-ENN
+  - stroke prediction
+  - reproducibility
+preferred-citation:
+  type: conference-paper
+  title: "Learning from Imbalanced Stroke Data: A Comparative Study of SMOTE and SMOTE-ENN on Structured Health Records"
+  authors:
+    - family-names: Soehardjianto
+      given-names: Lambert Aditama
+    - family-names: Soetresno
+      given-names: Wilsen
+    - family-names: Sihotang
+      given-names: Erna Fransisca Angela
+    - family-names: Ohyver
+      given-names: Margaretha
+  collection-title: "2026 13th International Conference on ICT for Smart Society (ICISS)"
+  conference:
+    name: "2026 13th International Conference on ICT for Smart Society (ICISS)"
+    city: Bandung
+    country: ID
+    date-start: 2026-08-26
+    date-end: 2026-08-27
+  publisher:
+    name: IEEE
+  year: 2026
+  start: 1
+  end: 6
+  doi: "10.1109/ICISS71466.2026.11715456"
