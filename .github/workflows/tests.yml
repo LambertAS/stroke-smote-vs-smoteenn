@@ -1,0 +1,90 @@
+name: tests
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install -e . --no-deps
+
+      - name: Environment
+        run: |
+          python - <<'EOF'
+          import os, platform, json
+          import xgboost
+          print("platform:", platform.platform())
+          print("python:", platform.python_version())
+          print("os.cpu_count():", os.cpu_count())
+          print("xgboost:", xgboost.__version__)
+          print("xgboost.build_info():")
+          print(json.dumps(xgboost.build_info(), indent=2, default=str))
+          EOF
+
+      - name: Download data
+        run: python -m stroke_imbalance.data
+
+      - name: Reproduce (paper profile)
+        run: python -m stroke_imbalance.run --config configs/paper.yaml
+
+      - name: Tests
+        id: pytest
+        continue-on-error: true
+        run: python -m pytest -v
+
+      # Diagnostic only: runs when the tests fail. configs/paper.yaml is not changed.
+      - name: "Diagnostic: XGBoost rows with n_jobs=2 (free Colab had 2 vCPUs)"
+        if: steps.pytest.outcome == 'failure'
+        run: |
+          python - <<'EOF'
+          import pandas as pd
+          from xgboost import XGBClassifier
+          from stroke_imbalance.config import load_config
+          from stroke_imbalance.data import load_raw
+          from stroke_imbalance.evaluate import holdout_metrics
+          from stroke_imbalance.features import prepare_holdout
+          from stroke_imbalance.models import model_params
+          from stroke_imbalance.resampling import REGIME_LABELS, resample
+
+          cfg = load_config("configs/paper.yaml")
+          data = prepare_holdout(load_raw(), cfg)
+          rows = []
+          for regime in cfg["regimes"]:
+              X_res, y_res = resample(data.X_train, data.y_train, regime, cfg["seed"])
+              params = {**model_params("xgb", regime, cfg), "n_jobs": 2}
+              model = XGBClassifier(**params).fit(X_res, y_res)
+              rows.append({"Model": "XGB", "Resampling": REGIME_LABELS[regime],
+                           **holdout_metrics(model, data.X_test, data.y_test)})
+          out = pd.DataFrame(rows)
+          out.to_csv("results/paper/diagnostic_xgb_njobs2.csv", index=False)
+          print("Notebook:")
+          print(pd.read_csv("tests/expected/table4_notebook.csv").query("Model == 'XGB'")
+                .to_string(index=False, float_format=lambda v: f"{v:.6f}"))
+          print("\nLinux, n_jobs=2:")
+          print(out.to_string(index=False, float_format=lambda v: f"{v:.6f}"))
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: table4-linux
+          path: |
+            results/paper/table4.csv
+            results/paper/diagnostic_xgb_njobs2.csv
+          if-no-files-found: warn
+
+      - name: Fail if tests failed
+        if: steps.pytest.outcome == 'failure'
+        run: exit 1
