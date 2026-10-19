@@ -13,19 +13,21 @@ The paper's Table II lists a decision threshold of 0.5 for all models, SVM inclu
 
 This repo follows the notebook (`src/stroke_imbalance/evaluate.py`), so the SVM accuracy, precision, recall and F1 in Table IV are decision-function labels, not a 0.5 cut on `predict_proba`. PR-AUC uses `predict_proba` for all models, as in the notebook.
 
-### XGBoost `n_jobs=-1`
+### XGBoost thread count: `n_jobs=-1` in the notebook, `n_jobs: 2` here
 
-The notebook builds every `XGBClassifier` with `n_jobs=-1` (all available cores). Table II in the paper does not list this setting. The paper profile (`configs/paper.yaml`) includes it to match the notebook.
+The notebook builds every `XGBClassifier` with `n_jobs=-1` (all available cores). Table II in the paper does not list this setting. The Colab VM had 2 CPUs, so the original run used 2 threads.
 
-This matters for reproducibility: with `tree_method="hist"` (the XGBoost 3.x default), results on the same machine depend on the number of threads (see below).
+With `tree_method="hist"` (the XGBoost 3.x default), results depend on the number of threads. The paper profile (`configs/paper.yaml`) therefore pins `n_jobs: 2`, which reproduces the original run on machines with any number of cores.
 
 ## Table IV (paper profile)
 
-Status after Phase 1: LR and SVM rows match the notebook to full precision (tolerance 1e-6 for accuracy, precision, recall and F1; 1e-4 for PR-AUC). Table III class counts match exactly.
+**Resolved.** On Linux, all 45 cells of Table IV match the notebook exactly (maximum absolute difference 0.0 in every metric), and Table III class counts match. Reference run: GitHub Actions run [39197509940](https://github.com/LambertAS/stroke-smote-vs-smoteenn/actions/runs/39197509940) (ubuntu-latest, glibc 2.39, Python 3.12.15, xgboost 3.1.2 built with GCC 10.3.1 and OpenMP, `os.cpu_count()` = 2). The committed `results/paper/` tables come from the Linux CI artifact.
 
-### Open: XGBoost rows on Windows
+Linux is the reference platform. LR and SVM rows match on every platform tested (Linux and Windows). The XGBoost rows are exact on Linux only: XGBoost's row and column sampling draws from C++ standard-library random distributions, whose output differs between the Linux (GCC) and Windows (MSVC) builds for the same seed. On non-Linux platforms `tests/test_reproduce_table4.py` skips the XGBoost cells.
 
-On Windows 11 (16 logical CPUs, the pinned library versions), all three XGBoost rows differ from the notebook:
+### XGBoost rows on Windows (for reference)
+
+On Windows 11 (16 logical CPUs, the pinned library versions, `n_jobs=-1`), the XGBoost rows differ slightly from the notebook:
 
 | Regime | Metric | Notebook | Windows, `n_jobs=-1` |
 |---|---|---|---|
@@ -35,4 +37,4 @@ On Windows 11 (16 logical CPUs, the pinned library versions), all three XGBoost 
 | SMOTE-ENN | Recall | 0.66 | 0.58 |
 | SMOTE-ENN | PR-AUC | 0.215127 | 0.206255 |
 
-On the same machine, `n_jobs` of 1, 2, 3, 8 and -1 each give a different but repeatable result, and none matches the notebook. The inputs are identical (LR and SVM match on the same arrays), so the difference is inside XGBoost training. The notebook ran on Linux (Colab). A Linux CI run is being used to check whether the difference is due to the platform.
+On the same machine, `n_jobs` of 1, 2, 3, 8 and -1 each give a different but repeatable result, and none matches the notebook (with `n_jobs=2`, XGB SMOTE recall is 0.38). The inputs are identical (LR and SVM match on the same arrays), so the difference is inside XGBoost training and comes from the platform.

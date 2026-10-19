@@ -42,5 +42,7 @@ models:
       colsample_bytree: 0.8
       objective: "binary:logistic"
       eval_metric: logloss
-      n_jobs: -1
+      # The notebook used n_jobs=-1 on a Colab VM with 2 CPUs. XGBoost "hist" results depend on
+      # the thread count, so this pins 2 threads for readers with more cores.
+      n_jobs: 2
       random_state: 42

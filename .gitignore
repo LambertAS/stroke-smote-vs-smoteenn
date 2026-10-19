@@ -1,6 +1,7 @@
 # Private, never committed
 claude_code_prompt_stroke_repo.md
 CLAUDE.md
+.claude/settings.local.json
 private/
 *.pdf
 

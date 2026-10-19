@@ -4,6 +4,8 @@ Reproduction code for "Learning from Imbalanced Stroke Data: A Comparative Study
 
 Work in progress. The full README follows once all analyses are in place.
 
+**Platform note.** Linux is the reference platform: there, every Table IV cell matches the original Colab notebook exactly. The XGBoost rows depend on platform-specific random sampling, so on Windows or macOS they differ slightly and their tests are skipped. See [docs/reproduction_report.md](docs/reproduction_report.md).
+
 ## Quickstart
 
 Requires Python 3.12.
