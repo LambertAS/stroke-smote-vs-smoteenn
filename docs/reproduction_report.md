@@ -47,7 +47,7 @@ Reconstruction choices the paper does not specify:
 | XGB | SMOTE | 0.144 ± 0.020 | 0.154 ± 0.032 | 0.301 ± 0.052 | 0.272 ± 0.064 | 0.202 ± 0.031 | 0.187 ± 0.037 |
 | XGB | SMOTE-ENN | 0.154 ± 0.021 | 0.155 ± 0.035 | 0.528 ± 0.072 | 0.521 ± 0.078 | 0.229 ± 0.026 | 0.221 ± 0.030 |
 
-Every reconstructed mean is within one of the paper's standard deviations of the paper's value. The largest gaps are in the SVM rows: PR-AUC 0.014 and 0.017 lower, SMOTE recall 0.043 lower, and SMOTE F1 0.012 lower (about one full standard deviation). The qualitative pattern is the same as in the paper: LR has the highest PR-AUC; SMOTE-ENN raises recall over SMOTE for every model; PR-AUC barely changes between the two regimes. The paper does not say where the scaler was fit inside CV or which standard deviation was reported, and either can explain gaps of this size.
+Every reconstructed mean is within about one of the paper's standard deviations of the paper's value. The largest gaps are in the SVM rows: PR-AUC 0.014 and 0.017 lower, SMOTE recall 0.043 lower, and SMOTE F1 0.012 lower (about one full standard deviation). The qualitative pattern is the same as in the paper: LR has the highest PR-AUC; SMOTE-ENN raises recall over SMOTE for every model; PR-AUC barely changes between the two regimes. The paper does not say where the scaler was fit inside CV or which standard deviation was reported, and either can explain gaps of this size.
 
 ### Other Phase 2 numbers
 
