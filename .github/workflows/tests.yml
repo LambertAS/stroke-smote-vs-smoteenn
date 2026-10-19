@@ -36,7 +36,7 @@ jobs:
       - name: Download data
         run: python -m stroke_imbalance.data
 
-      - name: Reproduce (paper profile)
+      - name: Reproduce (paper profile, all stages)
         run: python -m stroke_imbalance.run --config configs/paper.yaml
 
       - name: Tests

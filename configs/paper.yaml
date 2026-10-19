@@ -46,3 +46,22 @@ models:
       # the thread count, so this pins 2 threads for readers with more cores.
       n_jobs: 2
       random_state: 42
+
+# Phase 2 reconstructions. The notebook has no code for these; settings are fixed, not tuned.
+cv:
+  # Table V: repeated stratified CV on the 4,088 training rows. Scaling and resampling are
+  # fit inside each training fold (imblearn Pipeline).
+  n_splits: 5
+  n_repeats: 5
+  random_state: 42
+  regimes: [smote, smoteenn]
+  n_jobs: -1  # parallel folds; each fold's estimators carry their own fixed seeds
+
+explain:
+  # Fig 5 (SHAP), XGBoost gain importance and LR coefficients, on the hold-out test set.
+  regime: smote
+
+calibration:
+  # Fig 6: reliability curves and Brier scores on the hold-out test set.
+  regime: smote
+  n_bins: 10
