@@ -1,0 +1,4 @@
+# Optional: to open the notebooks in notebooks/. Install after requirements.txt.
+-r requirements.txt
+jupyterlab==4.6.4
+ipykernel==7.4.0

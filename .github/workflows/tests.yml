@@ -6,7 +6,9 @@ on:
 
 jobs:
   reproduce:
-    runs-on: ubuntu-latest
+    # Pinned image: the exact XGBoost results depend on the platform build, so a runner image
+    # change must be a deliberate edit here, not an automatic migration.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 

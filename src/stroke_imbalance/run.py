@@ -31,7 +31,7 @@ from stroke_imbalance.features import HoldoutData, prepare_holdout
 from stroke_imbalance.models import MODEL_LABELS, make_model
 from stroke_imbalance.plots import (
     plot_class_balance,
-    plot_numeric_by_stroke,
+    plot_bmi_glucose_by_stroke,
     plot_numeric_distributions,
     plot_pr_auc_vs_recall,
     plot_reliability,
@@ -132,7 +132,7 @@ def run_eda(raw: pd.DataFrame, out_dir: Path) -> None:
     fig_dir = out_dir / "figures"
     plot_class_balance(raw, fig_dir / "fig2_class_balance.png")
     plot_numeric_distributions(raw, fig_dir / "fig3_numeric_distributions.png")
-    plot_numeric_by_stroke(raw, fig_dir / "fig4_numeric_by_stroke.png")
+    plot_bmi_glucose_by_stroke(raw, fig_dir / "fig4_bmi_glucose_by_stroke.png")
     print("\nWrote EDA figures (Fig 2 to 4)")
 
 

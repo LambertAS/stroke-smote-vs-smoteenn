@@ -97,13 +97,13 @@ def plot_pr_auc_vs_recall(table4: pd.DataFrame, prevalence: float, path: Path, t
         return _save(fig, path)
 
 
-def _numeric_panels(figsize: tuple[float, float]) -> tuple[plt.Figure, list[plt.Axes]]:
-    fig, axes = plt.subplots(1, len(NUMERIC), figsize=figsize)
+def _panels(n: int, figsize: tuple[float, float]) -> tuple[plt.Figure, list[plt.Axes]]:
+    fig, axes = plt.subplots(1, n, figsize=figsize)
     return fig, list(axes)
 
 
 def plot_class_balance(raw: pd.DataFrame, path: Path) -> Path:
-    """EDA: number of patients with and without stroke."""
+    """Fig 2: number of patients with and without stroke."""
     counts = raw["stroke"].value_counts().sort_index()
     total = counts.sum()
     with plt.rc_context(STYLE):
@@ -123,9 +123,9 @@ def plot_class_balance(raw: pd.DataFrame, path: Path) -> Path:
 
 
 def plot_numeric_distributions(raw: pd.DataFrame, path: Path) -> Path:
-    """EDA: histograms of age, BMI and average glucose (missing BMI values left out)."""
+    """Fig 3: histograms of age, BMI and average glucose (missing BMI values left out)."""
     with plt.rc_context(STYLE):
-        fig, axes = _numeric_panels((12, 3.4))
+        fig, axes = _panels(len(NUMERIC), (12, 3.4))
         for ax, (col, label) in zip(axes, NUMERIC.items(), strict=True):
             sns.histplot(raw[col].dropna(), bins=30, color=SINGLE, edgecolor=SURFACE, ax=ax)
             ax.set_xlabel(label)
@@ -142,11 +142,12 @@ def plot_numeric_distributions(raw: pd.DataFrame, path: Path) -> Path:
         return _save(fig, path)
 
 
-def plot_numeric_by_stroke(raw: pd.DataFrame, path: Path) -> Path:
-    """EDA: density of age, BMI and average glucose by stroke status (each class normalized)."""
+def plot_bmi_glucose_by_stroke(raw: pd.DataFrame, path: Path) -> Path:
+    """Fig 4: density of BMI and average glucose by stroke status (each class normalized)."""
+    columns = {col: NUMERIC[col] for col in ("bmi", "avg_glucose_level")}
     with plt.rc_context(STYLE):
-        fig, axes = _numeric_panels((12, 3.4))
-        for ax, (col, label) in zip(axes, NUMERIC.items(), strict=True):
+        fig, axes = _panels(len(columns), (9, 3.4))
+        for ax, (col, label) in zip(axes, columns.items(), strict=True):
             for cls in (0, 1):
                 values = raw.loc[raw["stroke"] == cls, col].dropna()
                 sns.kdeplot(
@@ -161,9 +162,9 @@ def plot_numeric_by_stroke(raw: pd.DataFrame, path: Path) -> Path:
                 )
             ax.set_xlabel(label)
             ax.set_ylabel("Density" if ax is axes[0] else "")
-        axes[0].legend(loc="upper left", labelcolor=TEXT)
+        axes[0].legend(loc="upper right", labelcolor=TEXT)
         fig.suptitle(
-            "Numeric features by stroke status", x=0.01, ha="left", fontweight="bold", color=TEXT
+            "BMI and glucose by stroke status", x=0.01, ha="left", fontweight="bold", color=TEXT
         )
         fig.tight_layout()
         return _save(fig, path)

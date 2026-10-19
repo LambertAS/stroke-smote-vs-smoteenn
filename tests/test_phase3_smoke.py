@@ -10,7 +10,7 @@ from stroke_imbalance.evaluate import METRIC_COLUMNS, compare_tables, format_com
 from stroke_imbalance.features import prepare_holdout
 from stroke_imbalance.plots import (
     plot_class_balance,
-    plot_numeric_by_stroke,
+    plot_bmi_glucose_by_stroke,
     plot_numeric_distributions,
     plot_pr_auc_vs_recall,
 )
@@ -50,6 +50,6 @@ def test_figures_written(raw_df, tmp_path) -> None:
         plot_pr_auc_vs_recall(table4, 0.049, tmp_path / "headline.png", "test"),
         plot_class_balance(raw_df, tmp_path / "fig2.png"),
         plot_numeric_distributions(raw_df, tmp_path / "fig3.png"),
-        plot_numeric_by_stroke(raw_df, tmp_path / "fig4.png"),
+        plot_bmi_glucose_by_stroke(raw_df, tmp_path / "fig4.png"),
     ]
     assert all(p.stat().st_size > 0 for p in paths)

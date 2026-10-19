@@ -3,7 +3,9 @@
 The study uses the **Stroke Prediction Dataset** by fedesoriano on Kaggle:
 <https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset>
 
-The dataset is **not included in this repository**. It is downloaded at runtime into `data/raw/`, which is gitignored. Its terms of use are set by the dataset's Kaggle page; check them before reusing the data.
+The dataset is **not included in this repository**. It is downloaded at runtime into `data/raw/`, which is gitignored.
+
+On the dataset page, Kaggle shows the license as "Data files © Original Authors". The description gives the source as "(Confidential Source) - Use only for educational purposes" and asks: "If you use this dataset in your research, please credit the author." Check the page for the current terms before reusing the data.
 
 ## Getting the file
 
