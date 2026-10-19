@@ -1,0 +1,11 @@
+Feature,Gain
+age,0.25110468
+work_type,0.18054155
+smoking_status,0.10982493
+ever_married,0.1030336
+gender,0.07779254
+heart_disease,0.07744517
+hypertension,0.07098725
+bmi,0.050813887
+avg_glucose_level,0.04150284
+Residence_type,0.036953572
