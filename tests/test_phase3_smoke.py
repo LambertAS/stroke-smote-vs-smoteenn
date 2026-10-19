@@ -9,8 +9,8 @@ from stroke_imbalance.config import load_config
 from stroke_imbalance.evaluate import METRIC_COLUMNS, compare_tables, format_comparison
 from stroke_imbalance.features import prepare_holdout
 from stroke_imbalance.plots import (
-    plot_class_balance,
     plot_bmi_glucose_by_stroke,
+    plot_class_balance,
     plot_numeric_distributions,
     plot_pr_auc_vs_recall,
 )

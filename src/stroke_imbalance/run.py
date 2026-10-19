@@ -30,8 +30,8 @@ from stroke_imbalance.explain import lr_coefficients, shap_importance, xgb_gain_
 from stroke_imbalance.features import HoldoutData, prepare_holdout
 from stroke_imbalance.models import MODEL_LABELS, make_model
 from stroke_imbalance.plots import (
-    plot_class_balance,
     plot_bmi_glucose_by_stroke,
+    plot_class_balance,
     plot_numeric_distributions,
     plot_pr_auc_vs_recall,
     plot_reliability,
