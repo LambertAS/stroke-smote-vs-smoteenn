@@ -62,7 +62,36 @@ Every reconstructed mean is within one of the paper's standard deviations of the
 
 The paper's figures were made with code that is not in the notebook, so where a value differs (XGB gain for age, the SHAP magnitude, XGB Brier) the cause cannot be traced. The XGB gain gap is in line with the platform sensitivity of XGBoost described below. All three models are poorly calibrated after SMOTE (Fig 6): predicted probabilities sit far above the observed stroke rate. The highest bins hold only a few test patients, so the right-hand end of each curve is noisy.
 
-### XGBoost rows on Windows (for reference)
+## Phase 3: corrected profile (train-only BMI imputation)
+
+The original pipeline fills the 201 missing BMI values with the mean of all 5,110 rows before the train/test split, so the test rows contribute to a value the model is trained on. The corrected profile (`configs/corrected.yaml`) is identical except that a `SimpleImputer(strategy="mean")` is fit on the training rows only and then applied to both sets.
+
+| | Paper profile | Corrected profile |
+|---|---|---|
+| BMI value used for missing rows | 28.8932 (mean of all 5,110 rows) | 28.9222 (mean of the 4,088 training rows) |
+| Rows affected | 201 (170 train, 31 test) | same rows |
+
+Table IV, corrected profile, each cell shown as corrected value (difference from the paper profile). Full precision in `results/corrected/table4_vs_paper.csv`; Linux CI run [39199747197](https://github.com/LambertAS/stroke-smote-vs-smoteenn/actions/runs/39199747197).
+
+| Model | Resampling | Accuracy | Precision | Recall | F1 | PR-AUC |
+|---|---|---|---|---|---|---|
+| LR | Original | 0.9511 (+0.0000) | 0.0000 (+0.0000) | 0.0000 (+0.0000) | 0.0000 (+0.0000) | 0.2571 (+0.0000) |
+| LR | SMOTE | 0.7573 (+0.0000) | 0.1413 (+0.0000) | 0.7800 (+0.0000) | 0.2393 (+0.0000) | 0.2659 (+0.0001) |
+| LR | SMOTE-ENN | 0.7182 (+0.0010) | 0.1281 (+0.0004) | 0.8200 (+0.0000) | 0.2216 (+0.0006) | 0.2590 (-0.0004) |
+| SVM | Original | 0.9511 (+0.0000) | 0.0000 (+0.0000) | 0.0000 (+0.0000) | 0.0000 (+0.0000) | 0.0963 (+0.0005) |
+| SVM | SMOTE | 0.7544 (+0.0000) | 0.1345 (+0.0000) | 0.7400 (+0.0000) | 0.2277 (+0.0000) | 0.2120 (-0.0000) |
+| SVM | SMOTE-ENN | 0.7162 (+0.0010) | 0.1226 (+0.0004) | 0.7800 (+0.0000) | 0.2120 (+0.0006) | 0.2069 (-0.0002) |
+| XGB | Original | 0.9511 (+0.0000) | 0.5000 (+0.0000) | 0.0600 (+0.0200) | 0.1071 (+0.0331) | 0.2098 (+0.0025) |
+| XGB | SMOTE | 0.8904 (+0.0010) | 0.2182 (-0.0031) | 0.4800 (-0.0200) | 0.3000 (-0.0067) | 0.1974 (-0.0014) |
+| XGB | SMOTE-ENN | 0.8141 (-0.0049) | 0.1500 (-0.0142) | 0.6000 (-0.0600) | 0.2400 (-0.0229) | 0.2029 (-0.0122) |
+
+The leak itself is small (the imputed value moves by 0.03 BMI units), and LR and SVM barely react: at most one test patient changes class (accuracy +0.001) and PR-AUC moves by less than 0.001. XGBoost reacts more, because a tiny change in 170 training values changes which synthetic points SMOTE creates and where the trees split: recall changes by +1, -1 and -3 test patients (of 50) in the three regimes, and SMOTE-ENN PR-AUC drops by 0.012. None of these changes alters the paper's conclusions; they show how sensitive single-split results with 50 positives are to small perturbations.
+
+## Note on reruns
+
+LR coefficients, Brier scores and reliability-curve points can differ between two Linux CI runs in the 13th to 15th significant digit (for example, a Brier score of 0.1643046171931208 vs 0.16430461719311884), most likely from the order of floating-point operations in the numerical libraries on the runner. Every rounded value and all other result files are byte-identical between runs.
+
+## XGBoost rows on Windows (for reference)
 
 On Windows 11 (16 logical CPUs, the pinned library versions, `n_jobs=-1`), the XGBoost rows differ slightly from the notebook:
 
