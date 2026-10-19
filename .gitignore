@@ -1,0 +1,23 @@
+# Private, never committed
+claude_code_prompt_stroke_repo.md
+CLAUDE.md
+private/
+*.pdf
+
+# Data and credentials
+data/raw/*
+!data/raw/.gitkeep
+*.csv
+!results/**/*.csv
+!tests/expected/*.csv
+kaggle.json
+.env
+
+# Python and tooling
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
