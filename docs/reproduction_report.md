@@ -17,11 +17,13 @@ This repo follows the notebook (`src/stroke_imbalance/evaluate.py`), so the SVM 
 
 The notebook builds every `XGBClassifier` with `n_jobs=-1` (all available cores). Table II in the paper does not list this setting. The Colab VM had 2 CPUs, so the original run used 2 threads.
 
-With `tree_method="hist"` (the XGBoost 3.x default), results depend on the number of threads. The paper profile (`configs/paper.yaml`) therefore pins `n_jobs: 2`, which reproduces the original run on machines with any number of cores.
+With `tree_method="hist"` (the XGBoost 3.x default), results depend on the number of threads. The paper profile (`configs/paper.yaml`) therefore pins `n_jobs: 2`, which should reproduce the original run on machines with any number of cores (not tested on Linux machines with more than 2 cores).
 
 ## Table IV (paper profile)
 
 **Resolved.** On Linux, all 45 cells of Table IV match the notebook exactly (maximum absolute difference 0.0 in every metric), and Table III class counts match. Reference run: GitHub Actions run [39197509940](https://github.com/LambertAS/stroke-smote-vs-smoteenn/actions/runs/39197509940) (ubuntu-latest, glibc 2.39, Python 3.12.15, xgboost 3.1.2 built with GCC 10.3.1 and OpenMP, `os.cpu_count()` = 2). The committed `results/paper/` tables come from the Linux CI artifact.
+
+CI is now pinned to the `ubuntu-24.04` runner image instead of `ubuntu-latest`, so an image migration cannot change the results unnoticed; the latest run on it (image version 20261012.334.1, run [39202053039](https://github.com/LambertAS/stroke-smote-vs-smoteenn/actions/runs/39202053039)) still matches the notebook in every Table IV cell.
 
 Linux is the reference platform. LR and SVM rows match on every platform tested (Linux and Windows). The XGBoost rows are exact on Linux only: XGBoost's row and column sampling draws from C++ standard-library random distributions, whose output differs between the Linux (GCC) and Windows (MSVC) builds for the same seed. On non-Linux platforms `tests/test_reproduce_table4.py` skips the XGBoost cells.
 

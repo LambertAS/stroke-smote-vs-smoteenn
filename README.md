@@ -1,6 +1,6 @@
 # Learning from Imbalanced Stroke Data: SMOTE vs SMOTE-ENN
 
-Code and results for a comparison of SMOTE and SMOTE-ENN resampling for stroke prediction with logistic regression, SVM and XGBoost on the Kaggle stroke dataset.
+Reproducible code and results for our IEEE ICISS 2026 paper comparing SMOTE and SMOTE-ENN resampling for stroke prediction with logistic regression, SVM and XGBoost on the Kaggle stroke dataset.
 
 [![tests](https://github.com/LambertAS/stroke-smote-vs-smoteenn/actions/workflows/tests.yml/badge.svg)](https://github.com/LambertAS/stroke-smote-vs-smoteenn/actions/workflows/tests.yml)
 [![DOI](https://img.shields.io/badge/DOI-10.1109%2FICISS71466.2026.11715456-blue)](https://doi.org/10.1109/ICISS71466.2026.11715456)
@@ -90,7 +90,7 @@ The notebooks in [notebooks/](notebooks/) (EDA and a results walkthrough) need J
 | Fig 6, reliability curves and Brier scores | Reconstructed | `calibration.py`, stage `calibration` | [fig6_reliability_smote.png](results/paper/figures/fig6_reliability_smote.png), [brier_smote.csv](results/paper/brier_smote.csv) |
 | Fig 1, Table I | Not code-generated | | |
 
-"Exact" means every cell matches the original notebook's output. "Reconstructed" means the original code does not exist, so the analysis was rebuilt from the paper's description with fixed settings and was not tuned to match the paper. Every reconstructed number is compared with the paper in [docs/reproduction_report.md](docs/reproduction_report.md). In short, every Table V mean lies within one of the paper's standard deviations, the SHAP top five match in order, the LR coefficient signs match, and the Brier scores are 0.164 / 0.145 / 0.080 against the paper's 0.164 / 0.145 / 0.077.
+"Exact" means every cell matches the original notebook's output. "Reconstructed" means the original code does not exist, so the analysis was rebuilt from the paper's description with fixed settings and was not tuned to match the paper. Every reconstructed number is compared with the paper in [docs/reproduction_report.md](docs/reproduction_report.md). In short, every Table V mean lies within about one of the paper's standard deviations, the SHAP top five match in order, the LR coefficient signs match, and the Brier scores are 0.164 / 0.145 / 0.080 against the paper's 0.164 / 0.145 / 0.077.
 
 <details>
 <summary>Table V cross-validation: paper vs this repo (mean ± standard deviation over 25 folds)</summary>
