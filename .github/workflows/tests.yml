@@ -39,6 +39,9 @@ jobs:
       - name: Reproduce (paper profile, all stages)
         run: python -m stroke_imbalance.run --config configs/paper.yaml
 
+      - name: Reproduce (corrected profile, compared with the paper profile)
+        run: python -m stroke_imbalance.run --config configs/corrected.yaml
+
       - name: Tests
         run: python -m pytest -v
 
@@ -46,6 +49,6 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: results-paper-linux
-          path: results/paper/
+          name: results-linux
+          path: results/
           if-no-files-found: warn

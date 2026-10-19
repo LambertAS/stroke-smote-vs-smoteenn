@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
@@ -77,7 +78,8 @@ def prepare_holdout(raw: pd.DataFrame, cfg: dict) -> HoldoutData:
         stratify=y if split["stratify"] else None,
     )
     if strategy == "train_mean":
-        train_mean = X_train["bmi"].mean()
+        imputer = SimpleImputer(strategy="mean").fit(X_train[["bmi"]])
+        train_mean = float(imputer.statistics_[0])
         X_train, X_test = impute_bmi(X_train, train_mean), impute_bmi(X_test, train_mean)
     elif strategy != "full_data_mean":
         raise ValueError(f"Unknown bmi_imputation: {strategy}")

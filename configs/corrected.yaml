@@ -1,0 +1,13 @@
+# Corrected profile: identical to the paper profile except that the BMI mean used for
+# imputation is learned from the training rows only (SimpleImputer fit on the training set),
+# so no information from the test set reaches the model.
+base: configs/paper.yaml
+name: corrected
+output_dir: results/corrected
+
+preprocessing:
+  bmi_imputation: train_mean
+
+# Only the hold-out experiment is re-run; Table IV is compared with the paper profile.
+stages: [holdout]
+compare_with: results/paper/table4.csv

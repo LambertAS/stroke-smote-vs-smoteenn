@@ -15,6 +15,7 @@ data:
 
 reproduce:
 	$(PY) -m stroke_imbalance.run --config configs/paper.yaml
+	$(PY) -m stroke_imbalance.run --config configs/corrected.yaml
 
 test:
 	$(PY) -m pytest

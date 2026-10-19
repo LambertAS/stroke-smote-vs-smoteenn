@@ -2,8 +2,9 @@
 
 Usage: ``python -m stroke_imbalance.run --config configs/paper.yaml [--stages holdout,cv]``
 
-Stages: holdout (Tables III and IV), cv (Table V), explain (Fig 5, gain, LR coefficients),
-calibration (Fig 6). All run by default.
+Stages: holdout (Tables III and IV, PR-AUC vs recall chart), eda (Fig 2 to 4), cv (Table V),
+explain (Fig 5, gain, LR coefficients), calibration (Fig 6). By default a profile runs the
+stages listed under ``stages`` in its YAML, or all of them.
 """
 
 from __future__ import annotations
@@ -19,14 +20,26 @@ from stroke_imbalance.calibration import calibration_table
 from stroke_imbalance.config import load_config, set_seeds
 from stroke_imbalance.cv import cv_folds, format_mean_std, summarize_folds
 from stroke_imbalance.data import load_raw
-from stroke_imbalance.evaluate import METRIC_COLUMNS, holdout_metrics
+from stroke_imbalance.evaluate import (
+    METRIC_COLUMNS,
+    compare_tables,
+    format_comparison,
+    holdout_metrics,
+)
 from stroke_imbalance.explain import lr_coefficients, shap_importance, xgb_gain_importance
 from stroke_imbalance.features import HoldoutData, prepare_holdout
 from stroke_imbalance.models import MODEL_LABELS, make_model
-from stroke_imbalance.plots import plot_reliability, plot_shap_bar
+from stroke_imbalance.plots import (
+    plot_class_balance,
+    plot_numeric_by_stroke,
+    plot_numeric_distributions,
+    plot_pr_auc_vs_recall,
+    plot_reliability,
+    plot_shap_bar,
+)
 from stroke_imbalance.resampling import REGIME_LABELS, resample
 
-STAGES = ["holdout", "cv", "explain", "calibration"]
+STAGES = ["holdout", "eda", "cv", "explain", "calibration"]
 Models = dict[tuple[str, str], Any]
 
 
@@ -89,13 +102,38 @@ def _show(title: str, df: pd.DataFrame) -> None:
 
 
 def run_holdout(data: HoldoutData, cfg: dict, models: Models, out_dir: Path) -> None:
-    """Write Tables III and IV."""
+    """Write Tables III and IV, the PR-AUC vs recall chart and, if configured, a comparison."""
     counts = class_counts(data, cfg)
     save_table(counts, out_dir, "table3_class_counts")
     _show("Table III (training-set class counts)", counts)
     table4 = holdout_table(data, cfg, models)
     save_table(table4, out_dir, "table4")
     _show(f"Table IV (hold-out test set, n={len(data.y_test)})", table4)
+    plot_pr_auc_vs_recall(
+        table4,
+        prevalence=float(data.y_test.mean()),
+        path=out_dir / "figures" / "pr_auc_vs_recall.png",
+        title="Resampling moves recall far more than PR-AUC",
+    )
+    if "compare_with" in cfg:
+        base = pd.read_csv(cfg["compare_with"])
+        comparison = compare_tables(base, table4, suffixes=("paper", cfg["name"]))
+        save_table(
+            comparison,
+            out_dir,
+            "table4_vs_paper",
+            display=format_comparison(comparison, other=cfg["name"]),
+        )
+        _show(f"Table IV, {cfg['name']} minus paper profile", comparison)
+
+
+def run_eda(raw: pd.DataFrame, out_dir: Path) -> None:
+    """Write the exploratory figures (class balance and numeric distributions)."""
+    fig_dir = out_dir / "figures"
+    plot_class_balance(raw, fig_dir / "fig2_class_balance.png")
+    plot_numeric_distributions(raw, fig_dir / "fig3_numeric_distributions.png")
+    plot_numeric_by_stroke(raw, fig_dir / "fig4_numeric_by_stroke.png")
+    print("\nWrote EDA figures (Fig 2 to 4)")
 
 
 def run_cv(data: HoldoutData, cfg: dict, out_dir: Path) -> None:
@@ -154,23 +192,27 @@ def main(argv: list[str] | None = None) -> None:
     """Parse arguments and run the requested stages."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="configs/paper.yaml", help="YAML profile")
-    parser.add_argument("--stages", default=",".join(STAGES), help="comma-separated subset")
+    parser.add_argument("--stages", help="comma-separated subset (default: the profile's stages)")
     args = parser.parse_args(argv)
-    stages = args.stages.split(",")
+
+    cfg = load_config(args.config)
+    stages = args.stages.split(",") if args.stages else cfg.get("stages", STAGES)
     unknown = set(stages) - set(STAGES)
     if unknown:
         parser.error(f"unknown stages: {sorted(unknown)}")
-
-    cfg = load_config(args.config)
     set_seeds(cfg["seed"])
-    data = prepare_holdout(load_raw(cfg["data"]["path"]), cfg)
+    raw = load_raw(cfg["data"]["path"])
+    data = prepare_holdout(raw, cfg)
     out_dir = Path(cfg["output_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
     print(f"Profile '{cfg['name']}', stages: {', '.join(stages)}")
 
-    models = fit_holdout_models(data, cfg) if set(stages) - {"cv"} else {}
+    needs_models = {"holdout", "explain", "calibration"} & set(stages)
+    models = fit_holdout_models(data, cfg) if needs_models else {}
     if "holdout" in stages:
         run_holdout(data, cfg, models, out_dir)
+    if "eda" in stages:
+        run_eda(raw, out_dir)
     if "cv" in stages:
         run_cv(data, cfg, out_dir)
     if "explain" in stages:
