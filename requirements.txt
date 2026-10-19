@@ -1,0 +1,20 @@
+# Python 3.12. Core versions match the original Colab run (see archive/original_colab_notebook.ipynb).
+numpy==2.0.2
+scipy==1.16.3
+scikit-learn==1.6.1
+imbalanced-learn==0.14.0
+xgboost==3.1.2
+# Not recorded in the notebook; 2.2.2 was the Colab default with numpy 2.0.x.
+pandas==2.2.2
+
+# Analysis, plotting and data access
+shap==0.54.1
+matplotlib==3.11.2
+seaborn==0.13.2
+pyyaml==6.0.3
+kagglehub==1.0.2
+
+# Development
+pytest==9.1.1
+ruff==0.17.1
+nbstripout==0.9.1

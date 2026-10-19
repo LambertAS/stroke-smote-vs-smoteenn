@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stroke-imbalance"
+version = "0.1.0"
+description = "Reproduction of 'Learning from Imbalanced Stroke Data: A Comparative Study of SMOTE and SMOTE-ENN on Structured Health Records' (IEEE ICISS 2026)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+authors = [
+    { name = "Lambert Aditama Soehardjianto" },
+    { name = "Wilsen Soetresno" },
+    { name = "Erna Fransisca Angela Sihotang" },
+    { name = "Margaretha Ohyver" },
+]
+# Exact versions live in requirements.txt.
+dependencies = [
+    "numpy", "scipy", "pandas", "scikit-learn", "imbalanced-learn", "xgboost",
+    "shap", "matplotlib", "seaborn", "pyyaml", "kagglehub",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["archive"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "BLE"]
